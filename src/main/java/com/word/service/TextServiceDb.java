@@ -37,4 +37,9 @@ public class TextServiceDb implements TextService {
     public List<Text> getTextsByAuthor(String author) {
         return textAccess.getTextsByAuthor(author);
     }
+
+    @Override
+    public Text getLastLink() {
+        return textAccess.getLastLink();
+    }
 }

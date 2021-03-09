@@ -23,9 +23,9 @@ public class TextDaoDb implements TextDao {
             t.setBody(rs.getString("body"));
             t.setId(rs.getInt("id"));
             t.setLink(rs.getString("link"));
-            t.setTime(rs.getTimestamp("date"));
+            t.setTime(rs.getTimestamp("time"));
 
-            return null;
+            return t;
         }
     }
 
@@ -62,5 +62,12 @@ public class TextDaoDb implements TextDao {
         String q = "select id, author, body, link, time from text where author = ?";
         List<Text> texts = jdbc.query(q,new TextMapper(), author);
         return texts;
+    }
+
+    @Override
+    public Text getLastLink() {
+        String q = "select id, author, body, link, time from text order by time desc limit 1";
+        Text res = jdbc.queryForObject(q, new TextMapper());
+        return res;
     }
 }

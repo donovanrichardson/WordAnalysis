@@ -12,4 +12,6 @@ public interface TextDao {
     Text getTextById(int id);
 
     List<Text> getTextsByAuthor(String author);
+
+    Text getLastLink();
 }

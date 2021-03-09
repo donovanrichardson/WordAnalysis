@@ -11,4 +11,5 @@ public interface TextService {
     Text getTextById(int id);
     List<Text> getTextsByAuthor(String author);
 
+    Text getLastLink();
 }

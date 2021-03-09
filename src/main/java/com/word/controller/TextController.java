@@ -33,9 +33,14 @@ public class TextController {
         return textService.getTextById(id);
     }
 
-    @GetMapping("/{author}")
-    public List<Text> textsWithAuthor(@PathVariable String author){
+    @GetMapping("/byAuthor")
+    public List<Text> textsWithAuthor(@RequestParam String author){
         return textService.getTextsByAuthor(author);
+    }
+
+    @GetMapping("/lastlink")
+    public Text getLastLink(){
+        return textService.getLastLink();
     }
 
 
