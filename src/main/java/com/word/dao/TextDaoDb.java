@@ -67,7 +67,7 @@ public class TextDaoDb implements TextDao {
 
     @Override
     public Text getLastLink() {
-        String q = "select id, author, body, link, time, difference from text order by time desc limit 1";
+        String q = "select t.id, t.author, t.body, t.link, t.time, t.difference from text t right join word_text wt on t.id = wt.text_id order by time desc limit 1";
         Text res = jdbc.queryForObject(q, new TextMapper());
         return res;
     }
