@@ -1,10 +1,13 @@
 package com.word.dao;
 
 import com.word.domain.WordText;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.Null;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -12,12 +15,18 @@ import java.sql.Timestamp;
 @Repository
 public class WordTextDaoDb implements WordTextDao {
 
+    @Autowired
     JdbcTemplate jdbc;
 
     @Override
     public WordText getMostRecentUsage(String s) {
-        String sql = "select wt.difference, wt.word_id, wt.text_id, t.time from word_text wt join word w on w.id = wt.word_id join text t on t.id = wt.text_id where w.word = ? sort by t.time desc limit 1";
-        WordText mostRecent = jdbc.queryForObject(sql, new WordTextMapper(), s);
+        WordText mostRecent = new WordText();
+        try{
+            String sql = "select wt.difference, wt.word_id, wt.text_id, t.time from word_text wt join word w on w.id = wt.word_id join text t on t.id = wt.text_id where w.word = ? order by t.time desc limit 1";
+            mostRecent = jdbc.queryForObject(sql, new WordTextMapper(), s);
+        }catch(NullPointerException | EmptyResultDataAccessException n){
+            //
+        }
         return mostRecent;
     }
 
@@ -27,7 +36,7 @@ public class WordTextDaoDb implements WordTextDao {
         jdbc.update(sql,wt.getDifference(),wt.getWordId(),wt.getTextId());
 
         String wordSql = "select time from text where id = ?";
-        Timestamp wordTextTime = jdbc.queryForObject(wordSql, new Object[]{wt.getWordId()}, Timestamp.class);
+        Timestamp wordTextTime = jdbc.queryForObject(wordSql, new Object[]{wt.getTextId()}, Timestamp.class);
 
         wt.setTime(wordTextTime);
 

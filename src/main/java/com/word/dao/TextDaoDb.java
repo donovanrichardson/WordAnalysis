@@ -2,6 +2,7 @@ package com.word.dao;
 
 import com.word.domain.Text;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -67,8 +68,13 @@ public class TextDaoDb implements TextDao {
 
     @Override
     public Text getLastLink() {
-        String q = "select t.id, t.author, t.body, t.link, t.time, t.difference from text t right join word_text wt on t.id = wt.text_id order by time desc limit 1";
-        Text res = jdbc.queryForObject(q, new TextMapper());
-        return res;
+        Text res = new Text();
+        try{
+            String q = "select t.id, t.author, t.body, t.link, t.time, t.difference from text t right join word_text wt on t.id = wt.text_id order by time desc limit 1";
+            res = jdbc.queryForObject(q, new TextMapper());
+            return res;
+        }catch(EmptyResultDataAccessException e){
+            return res;
+        }
     }
 }

@@ -21,7 +21,7 @@ public class WordTextServiceDb implements WordTextService {
     @Override
     public WordText createWordText(Word currentWord, Text createdText, WordText lastWord) {
         WordText wtForCreation = new WordText();
-        if(lastWord != null){
+        if(lastWord != null&& lastWord.getTime() != null){
             wtForCreation.setDifference(Util.diffMilliToSecond(createdText.getTime().getTime(),lastWord.getTime().getTime()));
         }
         wtForCreation.setTextId(createdText.getId());

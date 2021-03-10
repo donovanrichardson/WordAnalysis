@@ -4,6 +4,7 @@ import com.word.dao.TextDao;
 import com.word.domain.Text;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -23,12 +24,13 @@ public class TextServiceDb implements TextService {
     WordService wordService;
 
     @Override
+    @Transactional
     public Text createText(Text t) {
         if(t.getTime() == null){
             t.setTime(new Timestamp(System.currentTimeMillis()));
         }
         Text lastText = getLastLink();
-        if(lastText != null){
+        if(lastText != null && lastText.getTime() != null){
             long newMillis = t.getTime().getTime();
             long oldMillis = lastText.getTime().getTime();
             double diffSecs = Util.diffMilliToSecond(newMillis, oldMillis);
@@ -45,7 +47,7 @@ public class TextServiceDb implements TextService {
 
     private Set<String> getWordsFromText(Text createdText) {
         Pattern reg = Pattern.compile("[^\\p{Punct}\\s]+");
-        Matcher m = reg.matcher("hello world! it is me, and you're dying");
+        Matcher m = reg.matcher(createdText.getBody());
         List<String> wordsFromText = new ArrayList<>();
         while(m.find()){
             wordsFromText.add(m.group().toLowerCase());

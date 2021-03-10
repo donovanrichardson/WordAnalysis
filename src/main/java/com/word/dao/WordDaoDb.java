@@ -18,7 +18,7 @@ public class WordDaoDb implements WordDao {
     @Override
     public Word createWord(String s) {
 
-        jdbc.update("insert ignore into word (word) values ()", s);
+        jdbc.update("insert ignore into word (word) values (?)", s);
         Word createdWord = jdbc.queryForObject("select id, word from word where word = ?", new WordMapper(), s);
         return createdWord;
     }
