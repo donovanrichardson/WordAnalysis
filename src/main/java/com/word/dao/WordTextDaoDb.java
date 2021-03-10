@@ -54,7 +54,7 @@ public class WordTextDaoDb implements WordTextDao {
             wt.setTextId(rs.getInt("text_id"));
             wt.setTime(rs.getTimestamp("time"));
 
-            return null;
+            return wt;
         }
     }
 
