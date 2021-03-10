@@ -19,6 +19,14 @@ public class TextServiceDb implements TextService {
         if(t.getTime() == null){
             t.setTime(new Timestamp(System.currentTimeMillis()));
         }
+        Text lastText = getLastLink();
+        if(lastText != null){
+            long newMillis = t.getTime().getTime();
+            long oldMillis = lastText.getTime().getTime();
+            Long diff = newMillis - oldMillis;
+            double diffSecs = diff.doubleValue()     / 1000;
+            t.setDifference(diffSecs);
+        }
         Text createdText = textAccess.createText(t);
         return createdText;
     }

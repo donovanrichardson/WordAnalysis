@@ -9,6 +9,15 @@ public class Text {
     private String link;
     private String body;
     private Timestamp time;
+    private double difference;
+
+    public double getDifference() {
+        return difference;
+    }
+
+    public void setDifference(double difference) {
+        this.difference = difference;
+    }
 
     public Timestamp getTime() {
         return time;

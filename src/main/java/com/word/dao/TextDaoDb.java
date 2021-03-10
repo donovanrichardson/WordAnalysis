@@ -24,6 +24,7 @@ public class TextDaoDb implements TextDao {
             t.setId(rs.getInt("id"));
             t.setLink(rs.getString("link"));
             t.setTime(rs.getTimestamp("time"));
+            t.setDifference(rs.getDouble("difference"));
 
             return t;
         }
@@ -35,8 +36,8 @@ public class TextDaoDb implements TextDao {
     @Override
     @Transactional
     public Text createText(Text t) {
-        String q = "insert into text (author, body, link, time) values (?,?,?,?)";
-        jdbc.update(q, t.getAuthor(), t.getBody(), t.getLink(), t.getTime());
+        String q = "insert into text (author, body, link, time, difference) values (?,?,?,?,?)";
+        jdbc.update(q, t.getAuthor(), t.getBody(), t.getLink(), t.getTime(), t.getDifference());
         int newId = jdbc.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
         t.setId(newId);
 
@@ -45,28 +46,28 @@ public class TextDaoDb implements TextDao {
 
     @Override
     public List<Text> getTexts() {
-        String q = "select id, author, body, link, time from text";
+        String q = "select id, author, body, link, time, difference from text";
         List<Text> texts = jdbc.query(q,new TextMapper());
         return texts;
     }
 
     @Override
     public Text getTextById(int id) {
-        String q = "select id, author, body, link, time from text where id = ?";
+        String q = "select id, author, body, link, time, difference from text where id = ?";
         Text res = jdbc.queryForObject(q, new TextMapper(), id);
         return res;
     }
 
     @Override
     public List<Text> getTextsByAuthor(String author) {
-        String q = "select id, author, body, link, time from text where author = ?";
+        String q = "select id, author, body, link, time, difference from text where author = ?";
         List<Text> texts = jdbc.query(q,new TextMapper(), author);
         return texts;
     }
 
     @Override
     public Text getLastLink() {
-        String q = "select id, author, body, link, time from text order by time desc limit 1";
+        String q = "select id, author, body, link, time, difference from text order by time desc limit 1";
         Text res = jdbc.queryForObject(q, new TextMapper());
         return res;
     }
