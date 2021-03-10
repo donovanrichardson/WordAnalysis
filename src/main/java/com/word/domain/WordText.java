@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 public class WordText {
     private int wordId;
     private int textId;
-    private double difference;
+    private Double difference;
     private Timestamp time;
 
     public int getWordId() {
@@ -24,11 +24,11 @@ public class WordText {
         this.textId = textId;
     }
 
-    public double getDifference() {
+    public Double getDifference() {
         return difference;
     }
 
-    public void setDifference(double difference) {
+    public void setDifference(Double difference) {
         this.difference = difference;
     }
 

@@ -9,13 +9,13 @@ public class Text {
     private String link;
     private String body;
     private Timestamp time;
-    private double difference;
+    private Double difference;
 
-    public double getDifference() {
+    public Double getDifference() {
         return difference;
     }
 
-    public void setDifference(double difference) {
+    public void setDifference(Double difference) {
         this.difference = difference;
     }
 

@@ -24,9 +24,12 @@ public class WordServiceDb implements WordService {
         List<Word> createdWords = new ArrayList<>();
 
         for(String s: wordsFromText){
-             WordText recent = wtService.getMostRecentUsage(s);
+             WordText lastWord = wtService.getMostRecentUsage(s); //may be null
+             Word currentWord = wordAccess.createWord(s);
+             WordText currentWordText = wtService.createWordText(currentWord, createdText, lastWord);
+             createdWords.add(currentWord);
         }
 
-        return null;
+        return createdWords;
     }
 }
