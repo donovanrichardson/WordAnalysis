@@ -3,11 +3,13 @@ package com.word.dao;
 import com.word.domain.WordText;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+@Repository
 public class WordTextDaoDb implements WordTextDao {
 
     JdbcTemplate jdbc;
