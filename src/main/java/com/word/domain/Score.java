@@ -5,10 +5,27 @@ import java.sql.Timestamp;
 public class Score {
 
     private Double value;
-    private String mode;
+    private boolean ratio;
     private Timestamp begin;
     private Timestamp end;
     private Word word;
+    private int id;
+
+    public boolean isRatio() {
+        return ratio;
+    }
+
+    public void setRatio(boolean ratio) {
+        this.ratio = ratio;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Double getValue() {
         return value;
@@ -16,14 +33,6 @@ public class Score {
 
     public void setValue(Double value) {
         this.value = value;
-    }
-
-    public String getMode() {
-        return mode;
-    }
-
-    public void setMode(String mode) {
-        this.mode = mode;
     }
 
     public Timestamp getBegin() {

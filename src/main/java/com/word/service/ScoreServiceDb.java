@@ -3,6 +3,7 @@ package com.word.service;
 import com.word.dao.ScoreDao;
 import com.word.domain.Score;
 import com.word.domain.Word;
+import com.word.domain.WordText;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
@@ -16,6 +17,9 @@ public class ScoreServiceDb implements ScoreService {
 
     @Autowired
     ScoreDao scoreAccess;
+
+    @Autowired
+    WordTextService wtService;
 
 //    private Timestamp endTime;
 
@@ -34,8 +38,10 @@ public class ScoreServiceDb implements ScoreService {
             scores.add(s);
         }
 
+        while (scores.remove(null));
+
         scoreAccess.saveScores(scores); //todo implement
-        return scores; //todo eliminate nulls?
+        return scores;
     }
 
     private Score getScoreForWord(Word w, int seconds, boolean ratio, Timestamp endTime) {
@@ -47,7 +53,7 @@ public class ScoreServiceDb implements ScoreService {
             return getScoreForWordWithRatio(w, seconds, endTime);
         }else{
             Timestamp beginTime = new Timestamp(endTime.getTime() - (seconds * 1000));
-            return getScoreForWordInterval(w, beginTime, endTime); //todo make sure that you
+            return getScoreForWordInterval(w, beginTime, endTime);
         }
     }
 
@@ -60,9 +66,39 @@ public class ScoreServiceDb implements ScoreService {
      * @return
      */
     private Score getRecentScoreForWord(Word w, int seconds, boolean ratio, Timestamp endTime) {
+        Timestamp beginTime = new Timestamp(endTime.getTime() - (seconds * 1000));
+        return scoreAccess.getRecentScoreForWord(w, ratio, beginTime, endTime); //impl done
+
     }
 
     private Score getScoreForWordInterval(Word w, Timestamp beginTime, Timestamp endTime) {
+
+        List<WordText> intervalWordTexts = wtService.getWordTextsWithinInterval(w, beginTime, endTime); //todo order desc
+        WordText preceding = wtService.getPrecedingWordText(beginTime); //todo impl
+        intervalWordTexts.add(0, preceding);
+        WordText endWt = new WordText();
+        endWt.setTime(endTime);
+        double secsDiff = Util.diffMilliToSecond(endTime.getTime(), intervalWordTexts.get(intervalWordTexts.size()-1).getTime().getTime());
+        endWt.setDifference(secsDiff);
+        intervalWordTexts.add(endWt);
+
+        double sumOfSquares = Math.pow(intervalWordTexts.get(1).getDifference(),2) - Math.pow(intervalWordTexts.get(0).getDifference(),2);
+
+        for(int i = 2; i < intervalWordTexts.size(); i++){
+            sumOfSquares+=Math.pow(intervalWordTexts.get(i).getDifference(),2);
+        }
+
+        double scoreValue = Math.sqrt(sumOfSquares);
+
+        Score s = new Score();
+        s.setWord(w);
+        s.setRatio(false);
+        s.setValue(scoreValue);
+        s.setBegin(beginTime);
+        s.setEnd(endTime);
+
+        return s;
+
     }
 
     private Score getScoreForWordWithRatio(Word w, Integer seconds, Timestamp endTime) {
@@ -98,7 +134,7 @@ public class ScoreServiceDb implements ScoreService {
         int scoreRange = this.getScoreRange(seconds, ratio);
         Word qualifyingWord = wordService.getQualifyingWord(scoreRange, endTime); //todo impl method
         Score result = this.getScoreForWord(qualifyingWord, seconds, ratio, endTime);
-        scoreAccess.saveScore(result);
+        scoreAccess.saveScore(result);//todo impl
         return result;
     }
 }
