@@ -31,17 +31,17 @@ public class ScoreServiceDb implements ScoreService {
         List<Score> scores = new ArrayList<>();
 
         int scoreRange = this.getScoreRange(seconds, ratio);
-        List<Word> qualifyingWords = wordService.getQualifyingWords(scoreRange, endTime); //todo impl method; I will call other domain's services from this service, not their daos.
+        List<Word> qualifyingWords = wordService.getQualifyingWords(scoreRange, endTime); //done impl method; I will call other domain's services from this service, not their daos.
 
         for(Word w : qualifyingWords){
-            Score s = this.getScoreForWord(w, seconds, ratio, endTime); //todo; make sure that you check for update
+            Score s = this.getScoreForWord(w, seconds, ratio, endTime); //impl'd
             scores.add(s);
         }
 
         while (scores.remove(null));
 
-        scoreAccess.saveScores(scores); //todo implement
-        return scores;
+        return scoreAccess.saveScores(scores); //done implement
+//        return scores;
     }
 
     private Score getScoreForWord(Word w, int seconds, boolean ratio, Timestamp endTime) {
@@ -73,8 +73,8 @@ public class ScoreServiceDb implements ScoreService {
 
     private Score getScoreForWordInterval(Word w, Timestamp beginTime, Timestamp endTime) {
 
-        List<WordText> intervalWordTexts = wtService.getWordTextsWithinInterval(w, beginTime, endTime); //todo order desc
-        WordText preceding = wtService.getPrecedingWordText(beginTime); //todo impl
+        List<WordText> intervalWordTexts = wtService.getWordTextsWithinInterval(w, beginTime, endTime); //done order desc
+        WordText preceding = wtService.getPrecedingWordText(w, beginTime); //done impl
         intervalWordTexts.add(0, preceding);
         WordText endWt = new WordText();
         endWt.setTime(endTime);
@@ -116,8 +116,15 @@ public class ScoreServiceDb implements ScoreService {
 
     }
 
-    private Score constructRatioScore(Score beginningScore, Score endScore) {
-        return scoreAccess.constructRatioScore(beginningScore, endScore);//todo implement
+    private Score constructRatioScore(Score beginningScore, Score endScore) { //impl done
+        Score res = new Score();
+        res.setRatio(true);
+        res.setBegin(beginningScore.getBegin());
+        res.setEnd(endScore.getEnd());
+        res.setWord(beginningScore.getWord());
+        res.setValue(endScore.getValue()/beginningScore.getValue());
+
+        return res;
     }
 
     private int getScoreRange(int seconds, boolean ratio) {
@@ -132,9 +139,12 @@ public class ScoreServiceDb implements ScoreService {
     public Score getScore(int wordId, int seconds, boolean ratio) {
         Timestamp endTime = new Timestamp(System.currentTimeMillis());
         int scoreRange = this.getScoreRange(seconds, ratio);
-        Word qualifyingWord = wordService.getQualifyingWord(scoreRange, endTime); //todo impl method
+        Word qualifyingWord = wordService.getQualifyingWord(wordId, scoreRange, endTime); //done impl method
+        if(qualifyingWord == null){
+            return null;
+        }
         Score result = this.getScoreForWord(qualifyingWord, seconds, ratio, endTime);
-        scoreAccess.saveScore(result);//todo impl
-        return result;
+        return scoreAccess.saveScore(result);//done impl
+//        return result;
     }
 }

@@ -7,10 +7,12 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -20,19 +22,26 @@ public class ScoreDaoDb implements ScoreDao {
     JdbcTemplate jdbc;
 
     @Override
-    public void saveScores(List<Score> scores) {
+    public List<Score> saveScores(List<Score> scores) {
 
+        List<Score> res = new ArrayList<>();
+        for(Score s : scores){
+            res.add(saveScore(s));
+        }
+        return res;
     }
 
     @Override
-    public void saveScore(Score result) {
+    @Transactional
+    public Score saveScore(Score s) {
+        String sql = "insert into score (word_id, value, ratio, begin, end) values (?,?,?,?,?)";
 
+        jdbc.update(sql, s.getWord().getId(), s.getValue(), s.isRatio(), s.getBegin(), s.getEnd());
+        int newId = jdbc.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+        s.setId(newId);
+        return s;
     }
 
-    @Override
-    public Score constructRatioScore(Score beginningScore, Score endScore) {
-        return null;
-    }
 
     @Override
     public Score getRecentScoreForWord(Word w, boolean ratio, Timestamp beginTime, Timestamp endTime) {

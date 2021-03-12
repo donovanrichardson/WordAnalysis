@@ -1,6 +1,5 @@
 package com.word.service;
 
-import com.word.domain.Score;
 import com.word.domain.Text;
 import com.word.domain.Word;
 import com.word.domain.WordText;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.List;
 
-@Service
 public interface WordTextService {
     WordText getMostRecentUsage(String s);
 
@@ -24,6 +22,6 @@ public interface WordTextService {
      */
     List<WordText> getWordTextsWithinInterval(Word w, Timestamp beginTime, Timestamp endTime);
 
-    WordText getPrecedingWordText(Timestamp beginTime);
+    WordText getPrecedingWordText(Word w, Timestamp beginTime);
 }
 

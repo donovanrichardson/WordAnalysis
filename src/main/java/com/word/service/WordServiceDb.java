@@ -7,6 +7,7 @@ import com.word.domain.WordText;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -33,5 +34,15 @@ public class WordServiceDb implements WordService {
         }
 
         return createdWords;
+    }
+
+    @Override
+    public Word getQualifyingWord(int wordId, int scoreRange, Timestamp endTime) {
+        return wordAccess.getQualifyingWord(wordId, scoreRange, endTime);
+    }
+
+    @Override
+    public List<Word> getQualifyingWords(int scoreRange, Timestamp endTime) {
+        return wordAccess.getQualifyingWords(scoreRange,endTime);
     }
 }

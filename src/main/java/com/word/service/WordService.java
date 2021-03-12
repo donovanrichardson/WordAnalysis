@@ -1,10 +1,7 @@
 package com.word.service;
 
-import com.word.dao.TextDao;
-import com.word.dao.WordDao;
 import com.word.domain.Text;
 import com.word.domain.Word;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -16,7 +13,7 @@ public interface WordService {
 
     List<Word> createWords(Set<String> wordsFromText, Text createdText);
 
-    Word getQualifyingWord(int scoreRange, Timestamp endTime);
+    Word getQualifyingWord(int wordId, int scoreRange, Timestamp endTime);
 
     List<Word> getQualifyingWords(int scoreRange, Timestamp endTime);
 }

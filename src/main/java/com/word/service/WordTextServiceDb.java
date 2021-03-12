@@ -7,15 +7,18 @@ import com.word.domain.WordText;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 @Service
 public class WordTextServiceDb implements WordTextService {
 
     @Autowired
-    WordTextDao wordTextAccess;
+    WordTextDao wtAccess;
 
     @Override
     public WordText getMostRecentUsage(String s) {
-        return wordTextAccess.getMostRecentUsage(s);
+        return wtAccess.getMostRecentUsage(s);
     }
 
     @Override
@@ -26,6 +29,16 @@ public class WordTextServiceDb implements WordTextService {
         }
         wtForCreation.setTextId(createdText.getId());
         wtForCreation.setWordId(currentWord.getId());
-        return wordTextAccess.createWordText(wtForCreation);
+        return wtAccess.createWordText(wtForCreation);
+    }
+
+    @Override
+    public List<WordText> getWordTextsWithinInterval(Word w, Timestamp beginTime, Timestamp endTime) {
+        return wtAccess.getWordTextsWithinInterval(w,beginTime,endTime);
+    }
+
+    @Override
+    public WordText getPrecedingWordText(Word w, Timestamp beginTime) {
+        return wtAccess.getPrecedingWordText(w, beginTime);
     }
 }

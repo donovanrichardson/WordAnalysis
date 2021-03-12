@@ -12,24 +12,26 @@ public interface ScoreDao {
      * Used to save scores in DB. Because some created scores are intermediate, this method is used to explicitly persist scores.
      *
      * @param scores
+     * @return
      */
-    void saveScores(List<Score> scores);
+    List<Score> saveScores(List<Score> scores);
 
     /**
      * Used to save a single score in DB. Because some created scores are intermediate, this method is used to explicitly persist scores.
      *
      * @param result
-     */
-    void saveScore(Score result);
-
-    /**
-     * Constructs a ratio score for two indvidual beginning and end scores
-     *
-     * @param beginningScore
-     * @param endScore
      * @return
      */
-    Score constructRatioScore(Score beginningScore, Score endScore);
+    Score saveScore(Score result);
+
+//    /**
+//     * Constructs a ratio score for two indvidual beginning and end scores
+//     *
+//     * @param beginningScore
+//     * @param endScore
+//     * @return
+//     */
+//    Score constructRatioScore(Score beginningScore, Score endScore);
 
     /**
      * Gets a recent score with begin and end for particular word and ratio.

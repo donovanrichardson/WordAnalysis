@@ -1,5 +1,6 @@
 package com.word.dao;
 
+import com.word.domain.Word;
 import com.word.domain.WordText;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -7,10 +8,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import javax.validation.constraints.Null;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Repository
 public class WordTextDaoDb implements WordTextDao {
@@ -41,6 +42,21 @@ public class WordTextDaoDb implements WordTextDao {
         wt.setTime(wordTextTime);
 
         return wt;
+    }
+
+    @Override
+    public List<WordText> getWordTextsWithinInterval(Word w, Timestamp beginTime, Timestamp endTime) {
+        String sql = "select word_id, text_id, difference, time from word_text where word_id = ? and time between ? and ? order by time desc";
+        List<WordText> res = jdbc.query(sql, new WordTextMapper(), w.getId(), beginTime, endTime);
+
+        return res;
+    }
+
+    @Override
+    public WordText getPrecedingWordText(Word w, Timestamp beginTime) {
+        String sql = "select word_id, text_id, difference, time from word_text where word_id = ? and time between ? and ?";
+        WordText res = jdbc.queryForObject(sql, new WordTextMapper(), w.getId(), beginTime);
+        return res;
     }
 
     private static final class WordTextMapper implements RowMapper<WordText> {
