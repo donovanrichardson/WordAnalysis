@@ -78,34 +78,54 @@ public class ScoreServiceDb implements ScoreService {
     }
 
     private Score getScoreForWordInterval(Word w, Timestamp beginTime, Timestamp endTime) {
-        double sumOfSquares = 0;
-
-        List<WordText> intervalWordTexts = wtService.getWordTextsWithinInterval(w, beginTime, endTime); //done order desc
-        try{
-            WordText preceding = wtService.getPrecedingWordText(w, beginTime); //done impl
-
-            WordText dummy = new WordText();
-            dummy.setDifference(intervalWordTexts.get(0).getDifference()-Util.diffMilliToSecond(intervalWordTexts.get(0).getTime().getTime(),beginTime.getTime()));
-//            intervalWordTexts.add(0, dummy);
-            sumOfSquares += Math.pow(intervalWordTexts.get(0).getDifference(),2) - Math.pow(dummy.getDifference(),2);
-            WordText removedWt = intervalWordTexts.remove(0);
-//            here, and then initialize the divisor add the difference between the non squares to the divisor.
-        }catch(EmptyResultDataAccessException e){
-            //
-        }
-        WordText endWt = new WordText();
+        double sumOfSquares = 0; //initializing
+        WordText dummy = new WordText(); //dummy wordtext for when the first wordtext precedes begintime
+        dummy.setTime(beginTime);
+        WordText endWt = new WordText(); //dummy wordText to represend endTime
         endWt.setTime(endTime);
-        double secsDiff = Util.diffMilliToSecond(endTime.getTime(), intervalWordTexts.get(intervalWordTexts.size()-1).getTime().getTime());
-        endWt.setDifference(secsDiff);
-        intervalWordTexts.add(endWt);
+
+        List<WordText> intervalWordTexts = wtService.getWordTextsWithinInterval(w, beginTime, endTime); //gets wt within interval
+        try{
+            WordText preceding = wtService.getPrecedingWordText(w, beginTime); // preceding wt if any. if none, catches error
+
+
+            dummy.setDifference(Util.diffMilliToSecond(dummy.getTime().getTime(),preceding.getTime().getTime())); //dummy gets its own difference based on preceding
+            intervalWordTexts.add(0, dummy);//adds dummy to beginning of list
+            WordText lastWt = intervalWordTexts.get(intervalWordTexts.size()-1); //if there are none in between begin and end, then this is the dummy
+
+            double secsDiff;//diff for lastWt
+            if(lastWt.equals(dummy)){
+                secsDiff = Util.diffMilliToSecond(endTime.getTime(), preceding.getTime().getTime()); // in this case, the lastWt diff is also based on preceding
+            }else{
+                secsDiff = Util.diffMilliToSecond(endTime.getTime(), lastWt.getTime().getTime()); //otherwise it is based on last between begin and end
+            }
+            endWt.setDifference(secsDiff);
+            intervalWordTexts.add(endWt);
+            sumOfSquares += (Math.pow(intervalWordTexts.get(1).getDifference(),2) - Math.pow(dummy.getDifference(),2)); //dummy == get(0)
+        }catch(EmptyResultDataAccessException e){// if there is no preceding, then calculating a dummy shouldn't be an issue. also, i think i prevent a score from being calculated for an interval that includes time before the first instance of a given word, so this isn't strictly necessary.
+            if (intervalWordTexts.size() == 0){
+                return null;
+            }
+            beginTime = intervalWordTexts.get(0).getTime();//since beginTime is before the first between, reassign beginTime.
+            intervalWordTexts.add(0, dummy); //adding a dummy just so that the indices for the for loop line up. the dummy and the first WordText between beginning and end (with a difference of 0) will be skipped.
+            double secsDiff = Util.diffMilliToSecond(endTime.getTime(), intervalWordTexts.get(intervalWordTexts.size()-1).getTime().getTime()); //again, because of no preceding, there is no need to calculate difference based on preceding
+            endWt.setDifference(secsDiff);
+            intervalWordTexts.add(endWt); //adding endWt to the end
+            //no noeed to add anything to sum of squares using the difference between the first two squares that i did before, since this instance will include the first wordtime instance of the given word.
+        }
+
 
 //        sumOfSquares = Math.pow(intervalWordTexts.get(1).getDifference(),2) - Math.pow(intervalWordTexts.get(0).getDifference(),2);  //todo what if get(0) is not the dummy WordText
 
-        for(int i = 0; i < intervalWordTexts.size(); i++){
-            sumOfSquares+=Math.pow(intervalWordTexts.get(i).getDifference(),2);
+        for(int i = 2; i < intervalWordTexts.size(); i++){
+            sumOfSquares+=Math.pow(intervalWordTexts.get(i).getDifference(),2); //if the list is only two long, then the sumOfSquares has already been calculated and this won't run.
         }
 
         double scoreValue = 2 * (sumOfSquares/Util.diffMilliToSecond(endTime.getTime(),beginTime.getTime())); //it's not square root, its divided by the whole duration
+
+        if(beginTime.equals(endTime)){
+            return null;
+        }
 
         Score s = new Score();
         s.setWord(w);
@@ -123,7 +143,7 @@ public class ScoreServiceDb implements ScoreService {
         Timestamp middleTime = new Timestamp(endTime.getTime() - (seconds * 1000));
         Score bothSidesScore = getScoreForWordInterval(w, beginTime, endTime);
 
-        if(bothSidesScore.getValue() > seconds){
+        if(bothSidesScore == null || bothSidesScore.getValue() > seconds){
             return null;
         }
         Score beginningScore = getScoreForWordInterval(w, beginTime, middleTime);
@@ -134,6 +154,9 @@ public class ScoreServiceDb implements ScoreService {
     }
 
     private Score constructRatioScore(Score beginningScore, Score endScore) { //impl done
+        if(beginningScore == null || endScore == null){
+            return null;
+        }
         Score res = new Score();
         res.setRatio(true);
         res.setBegin(beginningScore.getBegin());

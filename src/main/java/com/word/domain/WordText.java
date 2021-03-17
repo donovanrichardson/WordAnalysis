@@ -1,6 +1,7 @@
 package com.word.domain;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 
 public class WordText {
     private int wordId;
@@ -38,5 +39,18 @@ public class WordText {
 
     public void setTime(Timestamp time) {
         this.time = time;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WordText wordText = (WordText) o;
+        return wordId == wordText.wordId && textId == wordText.textId && Objects.equals(difference, wordText.difference) && Objects.equals(time, wordText.time);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(wordId, textId, difference, time);
     }
 }
