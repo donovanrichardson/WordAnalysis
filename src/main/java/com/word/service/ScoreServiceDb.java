@@ -5,6 +5,7 @@ import com.word.domain.Score;
 import com.word.domain.Word;
 import com.word.domain.WordText;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -23,12 +24,15 @@ public class ScoreServiceDb implements ScoreService {
     @Autowired
     WordTextService wtService;
 
+    @Autowired
+    TextService textService;
+
 //    private Timestamp endTime;
 
     @Override
     public List<Score> getScores(int seconds, boolean ratio) {
 
-        Timestamp endTime = new Timestamp(System.currentTimeMillis());
+        Timestamp endTime = textService.getLastLink().getTime();
 
         List<Score> scores = new ArrayList<>();
 
@@ -76,8 +80,13 @@ public class ScoreServiceDb implements ScoreService {
     private Score getScoreForWordInterval(Word w, Timestamp beginTime, Timestamp endTime) {
 
         List<WordText> intervalWordTexts = wtService.getWordTextsWithinInterval(w, beginTime, endTime); //done order desc
-        WordText preceding = wtService.getPrecedingWordText(w, beginTime); //done impl
-        intervalWordTexts.add(0, preceding);
+        try{
+            WordText preceding = wtService.getPrecedingWordText(w, beginTime); //done impl
+//            intervalWordTexts.add(0, preceding);
+//            initialize sumOfSquares = Math.pow(intervalWordTexts.get(0).getDifference(),2) - Math.pow(preceding.getDifference(),2); here, and then initialize the divisor add the difference between the non squares to the divisor.
+        }catch(EmptyResultDataAccessException e){
+            //
+        }
         WordText endWt = new WordText();
         endWt.setTime(endTime);
         double secsDiff = Util.diffMilliToSecond(endTime.getTime(), intervalWordTexts.get(intervalWordTexts.size()-1).getTime().getTime());
@@ -90,7 +99,7 @@ public class ScoreServiceDb implements ScoreService {
             sumOfSquares+=Math.pow(intervalWordTexts.get(i).getDifference(),2);
         }
 
-        double scoreValue = Math.sqrt(sumOfSquares);
+        double scoreValue = 2 * Math.sqrt(sumOfSquares); //it's not square root, its divided by the whole duration
 
         Score s = new Score();
         s.setWord(w);
@@ -139,7 +148,7 @@ public class ScoreServiceDb implements ScoreService {
 
     @Override
     public Score getScore(int wordId, int seconds, boolean ratio) {
-        Timestamp endTime = new Timestamp(System.currentTimeMillis());
+        Timestamp endTime = textService.getLastLink().getTime();
         int scoreRange = this.getScoreRange(seconds, ratio);
         Word qualifyingWord = wordService.getQualifyingWord(wordId, scoreRange, endTime); //done impl method
         if(qualifyingWord == null){

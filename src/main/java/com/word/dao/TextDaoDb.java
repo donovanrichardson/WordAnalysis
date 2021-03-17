@@ -47,7 +47,7 @@ public class TextDaoDb implements TextDao {
 
     @Override
     public List<Text> getTexts() {
-        String q = "select id, author, body, link, time, difference from text";
+        String q = "select id, author, body, link, time, difference from text order by time desc";
         List<Text> texts = jdbc.query(q,new TextMapper());
         return texts;
     }
@@ -61,7 +61,7 @@ public class TextDaoDb implements TextDao {
 
     @Override
     public List<Text> getTextsByAuthor(String author) {
-        String q = "select id, author, body, link, time, difference from text where author = ?";
+        String q = "select id, author, body, link, time, difference from text where author = ? order by time desc";
         List<Text> texts = jdbc.query(q,new TextMapper(), author);
         return texts;
     }

@@ -36,6 +36,8 @@ public class ScoreDaoDb implements ScoreDao {
     public Score saveScore(Score s) {
         String sql = "insert into score (word_id, value, ratio, begin, end) values (?,?,?,?,?)";
 
+        System.out.printf("%s,%s,%s,%s,%s\n",s.getWord().getId(),s.getValue(), s.isRatio(), s.getBegin(), s.getEnd());
+
         jdbc.update(sql, s.getWord().getId(), s.getValue(), s.isRatio(), s.getBegin(), s.getEnd());
         int newId = jdbc.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
         s.setId(newId);
