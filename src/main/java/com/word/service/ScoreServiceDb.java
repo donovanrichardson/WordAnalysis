@@ -5,11 +5,13 @@ import com.word.domain.Score;
 import com.word.domain.Word;
 import com.word.domain.WordText;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ScoreServiceDb implements ScoreService {
 
     @Autowired

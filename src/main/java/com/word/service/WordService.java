@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
-@Service
+
 public interface WordService {
 
     List<Word> createWords(Set<String> wordsFromText, Text createdText);
