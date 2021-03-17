@@ -48,7 +48,7 @@ public class WordDaoDb implements WordDao {
         List<Word> res = new ArrayList<>();
         long beginningMillis = endTime.getTime() - (scoreRange * 1000);
         Timestamp beginningTime = new Timestamp(beginningMillis);
-        String sql = "select w.id, w.word from word w join word_text wt on w.id = wt.word_id join text t on t.id = wt.text_id where t.time > ?";
+        String sql = "select distinct w.id, w.word from word w join word_text wt on w.id = wt.word_id join text t on t.id = wt.text_id where t.time > ?";
 
         try{
             res = jdbc.query(sql, new WordMapper(), beginningTime);

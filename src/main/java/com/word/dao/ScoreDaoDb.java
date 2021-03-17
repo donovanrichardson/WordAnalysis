@@ -35,6 +35,7 @@ public class ScoreDaoDb implements ScoreDao {
     @Transactional
     public Score saveScore(Score s) {
         String sql = "insert into score (word_id, value, ratio, begin, end) values (?,?,?,?,?)";
+        //todo make this insert ignore and make word_id, begin, and end unique index
 
         System.out.printf("%s,%s,%s,%s,%s\n",s.getWord().getId(),s.getValue(), s.isRatio(), s.getBegin(), s.getEnd());
 

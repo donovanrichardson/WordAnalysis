@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -26,6 +27,9 @@ public class ScoreServiceDb implements ScoreService {
 
     @Autowired
     TextService textService;
+
+    Comparator<Score> byScore = (Score s1, Score s2) ->
+            s1.getValue().compareTo(s2.getValue());
 
 //    private Timestamp endTime;
 
@@ -46,7 +50,9 @@ public class ScoreServiceDb implements ScoreService {
 
         while (scores.remove(null));
 
-        return scoreAccess.saveScores(scores); //done implement
+        List<Score> result = scoreAccess.saveScores(scores); //done implement
+        result.sort(byScore);
+        return result;
 //        return scores;
     }
 
