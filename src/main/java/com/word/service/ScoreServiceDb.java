@@ -78,12 +78,18 @@ public class ScoreServiceDb implements ScoreService {
     }
 
     private Score getScoreForWordInterval(Word w, Timestamp beginTime, Timestamp endTime) {
+        double sumOfSquares = 0;
 
         List<WordText> intervalWordTexts = wtService.getWordTextsWithinInterval(w, beginTime, endTime); //done order desc
         try{
             WordText preceding = wtService.getPrecedingWordText(w, beginTime); //done impl
-//            intervalWordTexts.add(0, preceding);
-//            initialize sumOfSquares = Math.pow(intervalWordTexts.get(0).getDifference(),2) - Math.pow(preceding.getDifference(),2); here, and then initialize the divisor add the difference between the non squares to the divisor.
+
+            WordText dummy = new WordText();
+            dummy.setDifference(intervalWordTexts.get(0).getDifference()-Util.diffMilliToSecond(intervalWordTexts.get(0).getTime().getTime(),beginTime.getTime()));
+//            intervalWordTexts.add(0, dummy);
+            sumOfSquares += Math.pow(intervalWordTexts.get(0).getDifference(),2) - Math.pow(dummy.getDifference(),2);
+            WordText removedWt = intervalWordTexts.remove(0);
+//            here, and then initialize the divisor add the difference between the non squares to the divisor.
         }catch(EmptyResultDataAccessException e){
             //
         }
@@ -93,13 +99,13 @@ public class ScoreServiceDb implements ScoreService {
         endWt.setDifference(secsDiff);
         intervalWordTexts.add(endWt);
 
-        double sumOfSquares = Math.pow(intervalWordTexts.get(1).getDifference(),2) - Math.pow(intervalWordTexts.get(0).getDifference(),2);
+//        sumOfSquares = Math.pow(intervalWordTexts.get(1).getDifference(),2) - Math.pow(intervalWordTexts.get(0).getDifference(),2);  //todo what if get(0) is not the dummy WordText
 
-        for(int i = 2; i < intervalWordTexts.size(); i++){
+        for(int i = 0; i < intervalWordTexts.size(); i++){
             sumOfSquares+=Math.pow(intervalWordTexts.get(i).getDifference(),2);
         }
 
-        double scoreValue = 2 * Math.sqrt(sumOfSquares); //it's not square root, its divided by the whole duration
+        double scoreValue = 2 * (sumOfSquares/Util.diffMilliToSecond(endTime.getTime(),beginTime.getTime())); //it's not square root, its divided by the whole duration
 
         Score s = new Score();
         s.setWord(w);

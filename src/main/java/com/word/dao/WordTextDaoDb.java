@@ -46,7 +46,7 @@ public class WordTextDaoDb implements WordTextDao {
 
     @Override
     public List<WordText> getWordTextsWithinInterval(Word w, Timestamp beginTime, Timestamp endTime) {
-        String sql = "select wt.word_id, wt.text_id, wt.difference, t.time from word_text wt join text t on wt.text_id=t.id where word_id = ? and time between ? and ? order by time desc";
+        String sql = "select wt.word_id, wt.text_id, wt.difference, t.time from word_text wt join text t on wt.text_id=t.id where word_id = ? and time between ? and ? order by time";
         List<WordText> res = jdbc.query(sql, new WordTextMapper(), w.getId(), beginTime, endTime);
 
         return res;
