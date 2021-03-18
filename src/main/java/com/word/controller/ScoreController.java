@@ -16,11 +16,13 @@ public class ScoreController {
     ScoreService scoreService;
 
     @PostMapping
-    public List<Score> getScores(@RequestParam Optional<Integer> hours, @RequestParam Optional<Integer> days, @RequestParam boolean ratio){
+    public List<Score> getScores(@RequestParam Optional<Integer> minutes, @RequestParam Optional<Integer> hours, @RequestParam Optional<Integer> days, @RequestParam boolean ratio){
 
         int seconds;
 
-        if(hours.isPresent()){
+        if(minutes.isPresent()){
+            seconds = minutes.get() * 60;
+        }else if(hours.isPresent()){
             seconds = hours.get() * 3600;
         }else{
             seconds = days.get()*86400;

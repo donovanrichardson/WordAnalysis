@@ -33,7 +33,7 @@ public class WordTextDaoDb implements WordTextDao {
 
     @Override
     public WordText createWordText(WordText wt) {
-        String sql = "insert into word_text (difference, word_id, text_id) values (?,?,?)";
+        String sql = "insert ignore into word_text (difference, word_id, text_id) values (?,?,?)";
         jdbc.update(sql,wt.getDifference(),wt.getWordId(),wt.getTextId());
 
         String wordSql = "select time from text where id = ?";
